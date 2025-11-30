@@ -28,3 +28,4 @@
 /home/alixsilver/Documents/Unisinos - Agatha/Redes II/Trabalho/TransmissionSimulator/obj/Debug/net8.0/TransmissionSimulator.pdb
 /home/alixsilver/Documents/Unisinos - Agatha/Redes II/Trabalho/TransmissionSimulator/obj/Debug/net8.0/TransmissionSimulator.genruntimeconfig.cache
 /home/alixsilver/Documents/Unisinos - Agatha/Redes II/Trabalho/TransmissionSimulator/obj/Debug/net8.0/ref/TransmissionSimulator.dll
+/home/alixsilver/Documents/Unisinos - Agatha/Redes II/Trabalho/TransmissionSimulator/obj/Debug/net8.0/TransmissionSimulator.sourcelink.json

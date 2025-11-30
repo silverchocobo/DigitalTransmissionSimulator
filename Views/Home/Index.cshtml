@@ -5,7 +5,7 @@
 @model TransmissionSimulator.Models.Transmission
 
 <div class="text-center">
-    <h1 class="display-4">Simulador de Transmissão</h1>
+    <h1 class="display-4">Simulador de Transmissão Digital</h1>
 </div>
 
 @using(Html.BeginForm("Index", "Home", FormMethod.Post, new {@id = "dataForm", @class= "form-horizontal"}))
@@ -16,8 +16,22 @@
 
      <div class="form-group mb-3">
         <label asp-for="NoiseLevel" class="form-label">Nível de Ruído (σ): <span id="noiseValue">@Model.NoiseLevel</span></label>
-        <input asp-for="NoiseLevel" type="range" class="form-range" min="0" max="2" step="0.1"
+        <input asp-for="NoiseLevel" type="range" class="form-range" min="0" max="50" step="0.1"
                oninput="document.getElementById('noiseValue').textContent = this.value">
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Amplitude" class="form-label">Amplitude (V): <span id="amplitude">@Model.Amplitude</span></label>
+        <input asp-for="Amplitude" type="range" class="form-range" min="0" max="20" step="1"
+               oninput="document.getElementById('amplitude').textContent = this.value">
+    </div>
+    <div class="form-check">
+        <input type="radio" id="ami" name="EncodingType" value="ami" checked = "@(Model.EncodingType == "ami" ? "checked" : null)">
+        <label class="form-check-label" for="ami">Codificação AMI / Modulação de Amplitude</label>
+    </div>
+    
+    <div class = "form-check">
+        <input type="radio" id="bpsk" name="EncodingType" value="bpsk" checked = "@(Model.EncodingType == "bpsk" ? "checked" : null)">
+        <label class="form-check-label" for="bpsk">Codificação NRZ Polar / Modulação BPSK</label>
     </div>
 
     <button id = "submitButton" class="btn btn-primary mt-4" type="submit">Transmitir</button>
@@ -26,165 +40,240 @@
 
 @if (Model != null)
     {
-        <div class="alert alert-success text-center mt-4">
+        <div class="alert alert-light text-center mt-4">
+
+        @if (Model.EncodingType == "ami")
+        {
             <h4>ASCII para bits: @Model.Binary</h4>
-            @* <h4>Codificação AMI Bipolar: @Model.AmiCode</h4> *@
-            @* <h4>Modulated Ami: @Model.AmiModulatedSignal</h4> *@
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Codificação AMI Bipolar</h5>
-                            <canvas id="amiChart"></canvas>
-                        </div>
-                    <div class="col-md-6">
-                        <h5>Sinal Modulado</h5>
-                        <canvas id="signalChart"></canvas>
-                    </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Codificação AMI Bipolar</h5>
+                    <canvas id="amiChart"></canvas>
                 </div>
+                <div class="col-md-6">
+                    <h5>Sinal Modulado (AMI)</h5>
+                    <canvas id="signalChart"></canvas>
+                </div>
+            </div>
+
             <div class="mt-3">
                 <h3>Mensagem Decodificada:</h3>
-                <h4 class="alert alert-success text-center mt-4">
+                <h4 class="font-monospace text-success bg-dark p-2 rounded">
                     @Model.DecodedMessage
                 </h4>
             </div>
-             <div class="mt-4 p-3 bg-secondary text-white rounded">
-            <h5>Debug Information:</h5>
-            <div class="text-monospace">
-                <p class="mb-0"><strong>Original AMI:</strong> @Model.AmiCode</p>
-                <p class="mb-0"><strong>Recovered AMI:</strong> @Model.Debug_RecoveredAmi</p>
-                <hr style="border-top: 1px solid white;"/>
-                <p class="mb-0"><strong>Original Binary:</strong> @Model.Binary</p>
-                <p class="mb-0"><strong>Recovered Binary:</strong> @Model.Debug_RecoveredBinary</p>
+
+            <div class="mt-4 p-3 bg-secondary text-white rounded">
+                <h5>Debug Information:</h5>
+                <div class="text-monospace">
+                    <p class="mb-0"><strong>Original AMI:</strong> @Model.AmiCode</p>
+                    <p class="mb-0"><strong>Recovered AMI:</strong> @Model.Debug_RecoveredAmi</p>
+                    <hr style="border-top: 1px solid white;" />
+                    <p class="mb-0"><strong>Original Binary:</strong> @Model.Binary</p>
+                    <p class="mb-0"><strong>Recovered Binary:</strong> @Model.Debug_RecoveredBinary</p>
+                </div>
             </div>
-        </div>
-        </div>
-                
+        }
+
+        @if (Model.EncodingType == "bpsk")
+        {   
+            <h4>ASCII para bits: @Model.Binary</h4>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Codificação NRZ Polar</h5>
+                    <canvas id="nrzChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <h5>Sinal Modulado (BPSK)</h5>
+                    <canvas id="bpskChart"></canvas>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <h3>Mensagem Decodificada (BPSK):</h3>
+                <h4 class="font-monospace text-primary bg-dark p-2 rounded">
+                    @Model.DecodedMessageBpsk
+                </h4>
+            </div>
+
+            <div class="mt-4 p-3 bg-secondary text-white rounded">
+                <h5>BPSK Debug Information:</h5>
+                <div class="text-monospace">
+                    <p class="mb-0"><strong>Original Binary:</strong> @Model.Binary</p>
+                    <p class="mb-0"><strong>Recovered Binary (BPSK):</strong> @Model.Debug_RecoveredBinaryBpsk</p>
+                </div>
+            </div>
+        } 
+
+    </div>
     }
 
-@* 
-This section adds scripts to the page. 
-It will be rendered by the @RenderSection("Scripts", required: false) in your _Layout.cshtml file.
-*@
 @section Scripts {
-
-     <script>
+    @* This script for the button validation runs on every page load, regardless of selection *@
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // --- Get references to the input field and the button ---
             const messageInput = document.getElementById('messageInput');
             const submitButton = document.getElementById('submitButton');
 
-            // --- Function to check the input and toggle the button's state ---
             function validateInput() {
-                // Trim removes whitespace from the beginning and end.
-                // If the input is empty or only contains spaces, disable the button.
                 if (messageInput.value.trim().length > 0) {
                     submitButton.disabled = false;
                 } else {
                     submitButton.disabled = true;
                 }
             }
-
-            // --- Listen for input events on the message box ---
-            // The 'input' event fires every time the content changes (typing, pasting, etc.)
             messageInput.addEventListener('input', validateInput);
-
-            // --- Run the validation once on page load ---
-            // This handles cases where the page reloads with a pre-filled (or empty) value.
             validateInput();
         });
     </script>
 
-    <!-- 1. Include the Chart.js library from a CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include the Chart.js library (only needed if results are being shown) -->
+    @if (Model != null && Model.Binary != null)
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    }
 
-    @* Only run the chart script if the signal data exists *@
-    @if (Model?.AmiModulatedSignal != null && Model.AmiModulatedSignal.Length > 0)
+    @* ===================================================================== *@
+    @*  CONDITIONAL SCRIPT BLOCK 1: Render this only for AMI                 *@
+    @* ===================================================================== *@
+    @if (Model.EncodingType == "ami" && Model.AmiModulatedSignalDouble != null)
     {
         <script>
-            try {
-            // Wait until the page content is fully loaded before running the script
             document.addEventListener("DOMContentLoaded", function () {
+                try {
+                    // --- Data for AMI Charts ---
+                    const binaryLabels = @Html.Raw(Json.Serialize(Model.Binary.ToCharArray()));
+                    const amiData = @Html.Raw(Json.Serialize(Model.AmiCodeInt));
+                    const signalData = @Html.Raw(Json.Serialize(Model.AmiModulatedSignalDouble));
+                    const dataToShow = signalData.slice(0, 400);
+                    const signalLabels = Array.from({ length: dataToShow.length }, (_, i) => i);
 
-                const binaryLabels = @Html.Raw(Json.Serialize(Model.Binary));
-                const amiData = @Html.Raw(Json.Serialize(Model.AmiCodeInt));
-                const signalData = @Html.Raw(Json.Serialize(Model.AmiModulatedSignalDouble));
-                
-                // 3. Parse the JSON data from the server into a JavaScript array
-                
-                // For performance and readability, let's only plot the first 400 samples
-                const dataToShow = signalData.slice(325, 400); 
-                
-                // Create labels for the x-axis (0, 1, 2, 3...)
-                const labels = Array.from(Array(dataToShow.length).keys());
-
-                const signalCtx = document.getElementById('signalChart').getContext('2d');
-
-                // Gráfico codificação AMI
-                const amiCtx = document.getElementById('amiChart').getContext('d');
-                new Chart(amiChart, {
-                    type: 'line', // We want a line chart
-                    data: {
-                        labels: binaryLabels,
-                        datasets: [{
-                            label: 'Bits Codificados',
-                            data: amiData,
-                            borderColor: 'rgb(75, 192, 192)',
-                            borderWidth: 1.5,
-                            pointRadius: 0, // Hides the dots on the line for a cleaner look
-                            stepped: 'before'
-                        }]
-                    },
-                    options: {
-                        animation: {
-                            duration: 0 // Disable animation for faster rendering
+                    // --- Chart 1: AMI Bipolar Encoding ---
+                    const amiCtx = document.getElementById('amiChart').getContext('2d');
+                    new Chart(amiCtx, {
+                        type: 'line',
+                        data: {
+                            labels: binaryLabels,
+                            datasets: [{
+                                label: 'Polaridade AMI',
+                                data: amiData,
+                                borderColor: 'rgb(0, 123, 255)',
+                                borderWidth: 2,
+                                stepped: 'before',
+                                pointRadius: 0
+                            }]
                         },
-                        scales: {
-                            x: {
-                                title: { display: true, text: 'Bits' }
-                            },
-                            y: {
-                                title: { display: true, text: 'Polaridade' },
-                                min: 1, // Set a fixed Y-axis to prevent jumping
-                                max: -1   // Should be slightly larger than your amplitude
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Bits da Mensagem' } },
+                                y: {
+                                    title: { display: true, text: 'Nível' },
+                                    ticks: { stepSize: 1 },
+                                    min: -1.5,
+                                    max: 1.5
+                                }
                             }
                         }
-                    }
-                });
-                
-                // 4. Gráfico modulação
-                new Chart(signalCtx, {
-                    type: 'line', // We want a line chart
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Amplitude do sinal modulado',
-                            data: dataToShow,
-                            borderColor: 'rgb(75, 192, 192)',
-                            borderWidth: 1.5,
-                            pointRadius: 0, // Hides the dots on the line for a cleaner look
-                            tension: 0.1    // Makes the line slightly curved
-                        }]
-                    },
-                    options: {
-                        animation: {
-                            duration: 0 // Disable animation for faster rendering
+                    });
+
+                    // --- Chart 2: Modulated Signal (AMI) ---
+                    const signalCtx = document.getElementById('signalChart').getContext('2d');
+                    new Chart(signalCtx, {
+                        type: 'line',
+                        data: {
+                            labels: signalLabels,
+                            datasets: [{
+                                label: 'Amplitude do Sinal Modulado',
+                                data: dataToShow,
+                                borderColor: 'rgb(220, 53, 69)',
+                                borderWidth: 1.5,
+                                pointRadius: 0
+                            }]
                         },
-                        scales: {
-                            x: {
-                                title: { display: true, text: 'Amostras' }
-                            },
-                            y: {
-                                title: { display: true, text: 'Amplitude' },
-                                min: -7, // Set a fixed Y-axis to prevent jumping
-                                max: 7   // Should be slightly larger than your amplitude
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Amostras' } },
+                                y: { title: { display: true, text: 'Amplitude' } }
                             }
                         }
-                    }
-                });
+                    });
+                } catch (e) {
+                    console.error("Erro ao renderizar os gráficos AMI:", e);
+                }
             });
-        } catch (e) {
-                // If any error happens, it will be logged here.
-                console.error("Erro de renderização da tabela:", e);
-            }
+        </script>
+    }
+
+    @* ===================================================================== *@
+    @*  CONDITIONAL SCRIPT BLOCK 2: Render this only for BPSK                *@
+    @* ===================================================================== *@
+    @if (Model.EncodingType == "bpsk" && Model.BpskSignal != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                try {
+                    // --- Data for BPSK Charts ---
+                    const binaryLabels = @Html.Raw(Json.Serialize(Model.Binary.ToCharArray()));
+                    const nrzData = @Html.Raw(Json.Serialize(Model.NRZCode));
+                    const bpskSignalData = @Html.Raw(Json.Serialize(Model.BpskSignal));
+                    const dataToShow = bpskSignalData.slice(0, 400);
+                    const bpskLabels = Array.from({ length: dataToShow.length }, (_, i) => i);
+
+                    // --- Chart 3: NRZ-Polar Encoding ---
+                    const nrzCtx = document.getElementById('nrzChart').getContext('2d');
+                    new Chart(nrzCtx, {
+                        type: 'line',
+                        data: {
+                            labels: binaryLabels,
+                            datasets: [{
+                                label: 'Nível NRZ-Polar',
+                                data: nrzData,
+                                borderColor: 'rgb(25, 135, 84)',
+                                borderWidth: 2,
+                                stepped: 'before',
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Bits da Mensagem' } },
+                                y: {
+                                    title: { display: true, text: 'Nível' },
+                                    ticks: { stepSize: 1 },
+                                    min: -1.5,
+                                    max: 1.5
+                                }
+                            }
+                        }
+                    });
+
+                    // --- Chart 4: Modulated Signal (BPSK) ---
+                    const bpskCtx = document.getElementById('bpskChart').getContext('2d');
+                    new Chart(bpskCtx, {
+                        type: 'line',
+                        data: {
+                            labels: bpskLabels,
+                            datasets: [{
+                                label: 'Amplitude do Sinal BPSK',
+                                data: dataToShow,
+                                borderColor: 'rgb(13, 110, 253)',
+                                borderWidth: 1.5,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Amostras' } },
+                                y: { title: { display: true, text: 'Amplitude' } }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Erro ao renderizar os gráficos BPSK:", e);
+                }
+            });
         </script>
     }
 }

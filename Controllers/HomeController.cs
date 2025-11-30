@@ -27,44 +27,45 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-        public ActionResult Index(Transmission model)
-        {
+    public ActionResult Index(Transmission model)
+    {
+        model.ConvertMessageToBinary();
+        double signalAmplitude = model.Amplitude;
 
-        // 1. Call the methods to process the data in the correct order
-            model.ConvertMessageToBinary();
+        if (model.EncodingType == "ami"){
             model.EncodeToAmiBipolar();
 
-            double signalAmplitude = 5.0;
-
-            // 2. Create the modulator and generate the signal
-            // This logic is better handled in the controller, not the view.
-            var amiModulator = new AmiModulator(
-                amplitude: signalAmplitude,
-                carrierFrequency: 1000,
-                bitRate: 100,
-                samplingRate: 8000
-            );
+            var amiModulator = new AmiModulator(signalAmplitude, 1000, 100, 8000);
             model.ModulateAmiToSignal(amiModulator);
 
-            model.AddNoiseToSignal(_noiseGenerator, model.NoiseLevel);
+            double[] noisyAmiSignal = model.AddNoiseToSignal(model.AmiModulatedSignalDouble, _noiseGenerator, model.NoiseLevel);
+            model.AmiModulatedSignalDouble = noisyAmiSignal; 
 
-            var receiver = new Receiver(
-            amplitude: signalAmplitude,
-            carrierFrequency: 1000,
-            bitRate: 100,
-            samplingRate: 8000
-            );
-
-                // Call the updated method
-            DecodingResult result = receiver.DemodulateAndDecode(model.AmiModulatedSignalDouble);
+            var amiReceiver = new Receiver(1000, 100, 8000, signalAmplitude);
+            var amiResult = amiReceiver.DemodulateAndDecode(model.AmiModulatedSignalDouble);
             
-            // Populate the model with all the results
-            model.DecodedMessage = result.DecodedMessage;
-            model.Debug_RecoveredAmi = result.RecoveredAmi;
-            model.Debug_RecoveredBinary = result.RecoveredBinary;
- 
-            return View(model);
+            model.DecodedMessage = amiResult.DecodedMessage;
+            model.Debug_RecoveredAmi = amiResult.RecoveredAmi;
+            model.Debug_RecoveredBinary = amiResult.RecoveredBinary;
         }
+        
+        else if (model.EncodingType == "bpsk"){
+            model.EncodeToNRZPolar();
+            var bpskModulator = new BpskModulator(signalAmplitude, 1000, 100, 8000);
+            model.ModulateNrzToBpsk(bpskModulator);
+
+            double[] noisyBpskSignal = model.AddNoiseToSignal(model.BpskSignal, _noiseGenerator, model.NoiseLevel);
+            model.BpskSignal = noisyBpskSignal; 
+
+            var bpskReceiver = new BpskReceiver(1000, 100, 8000);
+            var bpskResult = bpskReceiver.DemodulateAndDecode(model.BpskSignal);
+            
+            model.DecodedMessageBpsk = bpskResult.DecodedMessage;
+            model.Debug_RecoveredBinaryBpsk = bpskResult.RecoveredBinary;
+            }
+            
+        return View(model);
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

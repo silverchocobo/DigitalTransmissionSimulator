@@ -7,32 +7,23 @@ namespace TransmissionSimulator.Models
 {
     public class Transmission
     {
-         public string DecodedMessage { get; set; }
-        // --- New Debug Properties ---
+        public string DecodedMessage { get; set; }
+        public string DecodedMessageBpsk { get; set; }
+        public string Debug_RecoveredBinaryBpsk { get; set; }
         public string Debug_RecoveredAmi { get; set; }
         public string Debug_RecoveredBinary { get; set; }
         public string? Message { get; set; }
         public string? Binary { get; private set; } 
-        public string? AmiCode { get; private set; } 
+        public string? AmiCode { get; private set; }
+        public List<int>? NRZCode {get; private set;} 
         public string? AmiModulatedSignal { get; private set; }
         public List<int>? AmiCodeInt {get; private set; }
-        public double[]? AmiModulatedSignalDouble { get; private set; }
+        public double[]? AmiModulatedSignalDouble { get; set; }
+        public double[]? BpskSignal {get; set; }
         public double NoiseLevel { get; set; } = 0.0;
-        // public string? ConversionResult
-        // {
-        //     get
-        //     {
-        //         if (Message != null)
-        //         {
-        //             ConvertMessageToBinary();
-        //             return this.Binary;
-        //         }
-        //         else
-        //         {
-        //             return null;
-        //         }
-        //     }
-        // }
+        public double Amplitude { get; set; } = 1.0;
+        public string EncodingType { get; set; }
+    
         public void EncodeToAmiBipolar ()
         {
                 if (string.IsNullOrEmpty(this.Binary))
@@ -62,6 +53,29 @@ namespace TransmissionSimulator.Models
                 string resultString = string.Join(",", amiCode);
                 this.AmiCode = resultString;
             
+        }
+
+        public void EncodeToNRZPolar()
+        {
+            if(String.IsNullOrEmpty(this.Binary))
+            {
+                this.NRZCode = null;
+            }
+
+            List<int> NRZCode = new List<int>();
+
+            foreach (char bit in this.Binary)
+            {
+                if (bit == '0')
+                {
+                    NRZCode.Add(-1);
+                }
+                else{
+                    NRZCode.Add(1);
+                }
+            } 
+
+            this.NRZCode = NRZCode;
         }
 
         public void ConvertMessageToBinary()
@@ -102,22 +116,53 @@ namespace TransmissionSimulator.Models
             this.AmiModulatedSignal= resultString;
         }
 
-        public void AddNoiseToSignal(AwgnGenerator noiseGenerator, double standardDeviation)
+        public double[] AddNoiseToSignal(double[] cleanSignal, AwgnGenerator noiseGenerator, double standardDeviation)
+            {
+                // Return the original signal if there's nothing to do
+                if (cleanSignal == null || standardDeviation <= 0)
+                {
+                    return cleanSignal;
+                }
+
+                int sampleCount = cleanSignal.Length;
+                double[] noise = noiseGenerator.GenerateNoiseSignal(sampleCount, standardDeviation);
+                var noisySignal = new double[sampleCount];
+
+                // Create a new array with the combined signal and noise
+                for (int i = 0; i < sampleCount; i++)
+                {
+                    noisySignal[i] = cleanSignal[i] + noise[i];
+                }
+
+                return noisySignal;
+            }
+
+        public void AddNoiseToBpskSignal(AwgnGenerator noiseGenerator, double standardDeviation)
         {
             // Do nothing if there's no signal to add noise to, or if noise level is zero
-            if (this.AmiModulatedSignal == null || standardDeviation <= 0)
+            if (this.BpskSignal == null || standardDeviation <= 0)
             {
                 return;
             }
 
-            int sampleCount = this.AmiModulatedSignalDouble.Length;
+            int sampleCount = this.BpskSignal.Length;
             double[] noise = noiseGenerator.GenerateNoiseSignal(sampleCount, standardDeviation);
 
             // Add the noise to the signal, sample by sample
             for (int i = 0; i < sampleCount; i++)
             {
-                this.AmiModulatedSignalDouble[i] += noise[i];
+                this.BpskSignal[i] += noise[i];
             }
+        }
+
+        public void ModulateNrzToBpsk(BpskModulator modulator)
+        {
+            if (this.NRZCode == null)
+            {
+                this.BpskSignal = null;
+                return;
+            }
+            this.BpskSignal = modulator.Modulate(this.NRZCode);
         }
     }
 }
