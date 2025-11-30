@@ -16,16 +16,12 @@ namespace TransmissionSimulator.Models
             BitRate = bitRate;
             if (samplingRate < carrierFrequency * 4)
             {
-                throw new ArgumentException("Sampling rate should be at least 4 times the carrier frequency for good resolution.");
+                throw new ArgumentException("Sampling rate precisa ser 4x maior que a crrier frequency para bons resultados");
             }
             SamplingRate = samplingRate;
         }
 
-        /// <summary>
-        /// Modulates a ternary AMI string ('0', '+', '-') onto a carrier wave.
-        /// </summary>
-        /// <param name="amiCode">A string containing '0', '+', and '-' characters.</param>
-        /// <returns>An array of doubles representing the modulated signal's amplitude over time.</returns>
+        //Modula a o código AMI (com 0, + e -) para uma carrier wave, retornará um array de doubles representando a amplitude do sinal modulado.
          public double[] Modulate(List<int> amiCode)
         {
             if (amiCode == null || amiCode.Count == 0)
@@ -39,10 +35,10 @@ namespace TransmissionSimulator.Models
             double[] modulatedSignal = new double[totalSamples];
             int sampleIndex = 0;
 
-            // Iterate over each INTEGER in the AMI code list
+            // Itera sobre as integrais da lsita AMI code
             foreach (int symbol in amiCode)
             {
-                // The 'currentLevel' is now just the symbol itself (1, -1, or 0)
+                // 'currentLevel' é o símbolo (1, -1, ou 0)
                 double currentLevel = symbol;
 
                 for (int i = 0; i < samplesPerSymbol; i++)

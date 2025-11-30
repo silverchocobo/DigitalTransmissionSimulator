@@ -95,30 +95,20 @@ namespace TransmissionSimulator.Models
 
          public void ModulateAmiToSignal(AmiModulator modulator)
         {
-            // First, ensure we have an AMI code to modulate.
-            // if (this.AmiCode == null)
-            // {
-            //     EncodeBinaryToAmi();
-            // }
-
             if (string.IsNullOrEmpty(this.AmiCode))
             {
                 this.AmiModulatedSignal = null;
                 return;
             }
 
-            // Use the modulator to generate the signal and store it.
+            // Modula código AMI
             double[] amiModulated = modulator.Modulate(this.AmiCodeInt);
 
             this.AmiModulatedSignalDouble = amiModulated;
-
-            string resultString = string.Join(",", amiModulated);
-            this.AmiModulatedSignal= resultString;
         }
 
         public double[] AddNoiseToSignal(double[] cleanSignal, AwgnGenerator noiseGenerator, double standardDeviation)
             {
-                // Return the original signal if there's nothing to do
                 if (cleanSignal == null || standardDeviation <= 0)
                 {
                     return cleanSignal;
@@ -128,7 +118,7 @@ namespace TransmissionSimulator.Models
                 double[] noise = noiseGenerator.GenerateNoiseSignal(sampleCount, standardDeviation);
                 var noisySignal = new double[sampleCount];
 
-                // Create a new array with the combined signal and noise
+                // Adiciona ruído no sinal
                 for (int i = 0; i < sampleCount; i++)
                 {
                     noisySignal[i] = cleanSignal[i] + noise[i];
@@ -139,7 +129,6 @@ namespace TransmissionSimulator.Models
 
         public void AddNoiseToBpskSignal(AwgnGenerator noiseGenerator, double standardDeviation)
         {
-            // Do nothing if there's no signal to add noise to, or if noise level is zero
             if (this.BpskSignal == null || standardDeviation <= 0)
             {
                 return;
@@ -148,7 +137,7 @@ namespace TransmissionSimulator.Models
             int sampleCount = this.BpskSignal.Length;
             double[] noise = noiseGenerator.GenerateNoiseSignal(sampleCount, standardDeviation);
 
-            // Add the noise to the signal, sample by sample
+            // Adiciona ruído no sinal
             for (int i = 0; i < sampleCount; i++)
             {
                 this.BpskSignal[i] += noise[i];

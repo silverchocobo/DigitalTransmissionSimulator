@@ -24,7 +24,7 @@ namespace TransmissionSimulator.Models
     {
         var result = new DecodingResult
         {
-            DecodedMessage = "[Decoding Failed]",
+            DecodedMessage = "[Decodificação falhou]",
             RecoveredAmi = "",
             RecoveredBinary = ""
         };
@@ -44,12 +44,6 @@ namespace TransmissionSimulator.Models
                 int sampleIndex = i + j;
                 double time = (double)sampleIndex / SamplingRate;
                 
-                // ==========================================================
-                // POTENTIAL FIX: Use Sine instead of Cosine if there's a mismatch
-                // Let's try matching the carrier exactly. If your modulator
-                // accidentally used Sine, this would be the problem. For now,
-                // we will stick with Cosine and let the debug output guide us.
-                // ==========================================================
                 double localCarrier = Math.Cos(2 * Math.PI * CarrierFrequency * time);
                 integratedEnergy += noisySignal[sampleIndex] * localCarrier;
             }

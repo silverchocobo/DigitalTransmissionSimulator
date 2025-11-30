@@ -21,8 +21,8 @@ namespace TransmissionSimulator.Models
         {
             var result = new DecodingResult
             {
-                DecodedMessage = "[Decoding Failed]",
-                RecoveredAmi = null, // Not applicable for BPSK
+                DecodedMessage = "[Decodificação falhou",
+                RecoveredAmi = null,
                 RecoveredBinary = ""
             };
 
@@ -35,18 +35,17 @@ namespace TransmissionSimulator.Models
             {
                 double integratedEnergy = 0;
 
-                // Integrate over one bit period
+                // Itera sobre um tempo de bit
                 for (int j = 0; j < samplesPerBit && (i + j) < noisyBpskSignal.Length; j++)
                 {
                     int sampleIndex = i + j;
                     double time = (double)sampleIndex / SamplingRate;
                     
-                    // Multiply by the local carrier wave (must match the BPSK modulator)
+                    // Multiplica pela carrier wave
                     double localCarrier = Math.Cos(2 * Math.PI * CarrierFrequency * time);
                     integratedEnergy += noisyBpskSignal[sampleIndex] * localCarrier;
                 }
 
-                // Decision making: Is the energy positive or negative?
                 if (integratedEnergy > 0)
                 {
                     recoveredBinaryBuilder.Append('1');
@@ -59,7 +58,7 @@ namespace TransmissionSimulator.Models
             
             result.RecoveredBinary = recoveredBinaryBuilder.ToString();
 
-            // === BINARY TO TEXT DECODING (same as before) ===
+            // Binário para texto
             try
             {
                 var byteList = new List<byte>();
@@ -76,7 +75,7 @@ namespace TransmissionSimulator.Models
             }
             catch (Exception)
             {
-                return result; // Return with "Decoding Failed" message
+                return result;
             }
         }
     }

@@ -12,18 +12,21 @@
 {
 <form>
     <label>Mensagem</label>
-    @Html.TextBoxFor(m => m.Message, new { @class = "form-control", placeholder = "Enter your message", id = "messageInput" })
+    @Html.TextBoxFor(m => m.Message, new { @class = "form-control", placeholder = "Insira sua mensagem", id = "messageInput" })
+    <br>
 
      <div class="form-group mb-3">
         <label asp-for="NoiseLevel" class="form-label">Nível de Ruído (σ): <span id="noiseValue">@Model.NoiseLevel</span></label>
         <input asp-for="NoiseLevel" type="range" class="form-range" min="0" max="50" step="0.1"
                oninput="document.getElementById('noiseValue').textContent = this.value">
     </div>
+
     <div class="form-group mb-3">
         <label asp-for="Amplitude" class="form-label">Amplitude (V): <span id="amplitude">@Model.Amplitude</span></label>
         <input asp-for="Amplitude" type="range" class="form-range" min="0" max="20" step="1"
                oninput="document.getElementById('amplitude').textContent = this.value">
     </div>
+
     <div class="form-check">
         <input type="radio" id="ami" name="EncodingType" value="ami" checked = "@(Model.EncodingType == "ami" ? "checked" : null)">
         <label class="form-check-label" for="ami">Codificação AMI / Modulação de Amplitude</label>
@@ -46,6 +49,7 @@
         {
             <h4>ASCII para bits: @Model.Binary</h4>
             <hr />
+
             <div class="row">
                 <div class="col-md-6">
                     <h5>Codificação AMI Bipolar</h5>
@@ -111,7 +115,6 @@
     }
 
 @section Scripts {
-    @* This script for the button validation runs on every page load, regardless of selection *@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const messageInput = document.getElementById('messageInput');
@@ -129,28 +132,22 @@
         });
     </script>
 
-    <!-- Include the Chart.js library (only needed if results are being shown) -->
     @if (Model != null && Model.Binary != null)
     {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     }
 
-    @* ===================================================================== *@
-    @*  CONDITIONAL SCRIPT BLOCK 1: Render this only for AMI                 *@
-    @* ===================================================================== *@
     @if (Model.EncodingType == "ami" && Model.AmiModulatedSignalDouble != null)
     {
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 try {
-                    // --- Data for AMI Charts ---
                     const binaryLabels = @Html.Raw(Json.Serialize(Model.Binary.ToCharArray()));
                     const amiData = @Html.Raw(Json.Serialize(Model.AmiCodeInt));
                     const signalData = @Html.Raw(Json.Serialize(Model.AmiModulatedSignalDouble));
                     const dataToShow = signalData.slice(0, 400);
                     const signalLabels = Array.from({ length: dataToShow.length }, (_, i) => i);
 
-                    // --- Chart 1: AMI Bipolar Encoding ---
                     const amiCtx = document.getElementById('amiChart').getContext('2d');
                     new Chart(amiCtx, {
                         type: 'line',
@@ -178,7 +175,6 @@
                         }
                     });
 
-                    // --- Chart 2: Modulated Signal (AMI) ---
                     const signalCtx = document.getElementById('signalChart').getContext('2d');
                     new Chart(signalCtx, {
                         type: 'line',
@@ -206,22 +202,17 @@
         </script>
     }
 
-    @* ===================================================================== *@
-    @*  CONDITIONAL SCRIPT BLOCK 2: Render this only for BPSK                *@
-    @* ===================================================================== *@
     @if (Model.EncodingType == "bpsk" && Model.BpskSignal != null)
     {
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 try {
-                    // --- Data for BPSK Charts ---
                     const binaryLabels = @Html.Raw(Json.Serialize(Model.Binary.ToCharArray()));
                     const nrzData = @Html.Raw(Json.Serialize(Model.NRZCode));
                     const bpskSignalData = @Html.Raw(Json.Serialize(Model.BpskSignal));
                     const dataToShow = bpskSignalData.slice(0, 400);
                     const bpskLabels = Array.from({ length: dataToShow.length }, (_, i) => i);
 
-                    // --- Chart 3: NRZ-Polar Encoding ---
                     const nrzCtx = document.getElementById('nrzChart').getContext('2d');
                     new Chart(nrzCtx, {
                         type: 'line',
@@ -249,7 +240,6 @@
                         }
                     });
 
-                    // --- Chart 4: Modulated Signal (BPSK) ---
                     const bpskCtx = document.getElementById('bpskChart').getContext('2d');
                     new Chart(bpskCtx, {
                         type: 'line',

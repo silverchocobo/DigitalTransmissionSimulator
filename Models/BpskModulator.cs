@@ -19,10 +19,7 @@ namespace TransmissionSimulator.Models
             SamplingRate = samplingRate;
         }
 
-        /// <summary>
-        /// Modulates an NRZ-Polar signal (+1, -1) onto a carrier wave.
-        /// </summary>
-        /// <param name="nrzPolarCode">A List of integers containing only 1s and -1s.</param>
+        /// Modula o código NRZ polar (+1, -1) para carrier wave.
         public double[] Modulate(List<int> nrzPolarCode)
         {
             if (nrzPolarCode == null || nrzPolarCode.Count == 0)
@@ -36,13 +33,12 @@ namespace TransmissionSimulator.Models
             var modulatedSignal = new double[totalSamples];
             int sampleIndex = 0;
 
-            foreach (int level in nrzPolarCode) // level will be +1 or -1
+            foreach (int level in nrzPolarCode) // level vai ser +1 ou -1
             {
                 for (int i = 0; i < samplesPerBit; i++)
                 {
                     double time = (double)sampleIndex / SamplingRate;
                     
-                    // The core BPSK formula: level * Amplitude * cos(...)
                     modulatedSignal[sampleIndex] = level * Amplitude * Math.Cos(2 * Math.PI * CarrierFrequency * time);
                     
                     sampleIndex++;
