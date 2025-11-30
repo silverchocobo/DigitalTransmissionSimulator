@@ -3,6 +3,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+var url = $"http://*:{port}";
+builder.WebHost.UseUrls(url);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
