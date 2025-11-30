@@ -45,8 +45,10 @@ public class HomeController : Controller
             var amiResult = amiReceiver.DemodulateAndDecode(model.AmiModulatedSignalDouble);
             
             model.DecodedMessage = amiResult.DecodedMessage;
-            model.Debug_RecoveredAmi = amiResult.RecoveredAmi;
-            model.Debug_RecoveredBinary = amiResult.RecoveredBinary;
+            model.RecoveredAmi = amiResult.RecoveredAmi;
+            model.RecoveredBinary = amiResult.RecoveredBinary;
+
+            model.CalculateHammingDistance(model.RecoveredBinary);
         }
         
         else if (model.EncodingType == "bpsk"){
@@ -61,7 +63,9 @@ public class HomeController : Controller
             var bpskResult = bpskReceiver.DemodulateAndDecode(model.BpskSignal);
             
             model.DecodedMessageBpsk = bpskResult.DecodedMessage;
-            model.Debug_RecoveredBinaryBpsk = bpskResult.RecoveredBinary;
+            model.RecoveredBinaryBpsk = bpskResult.RecoveredBinary;
+
+            model.CalculateHammingDistance(model.RecoveredBinaryBpsk);
             }
             
         return View(model);

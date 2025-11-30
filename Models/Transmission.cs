@@ -9,9 +9,9 @@ namespace TransmissionSimulator.Models
     {
         public string DecodedMessage { get; set; }
         public string DecodedMessageBpsk { get; set; }
-        public string Debug_RecoveredBinaryBpsk { get; set; }
-        public string Debug_RecoveredAmi { get; set; }
-        public string Debug_RecoveredBinary { get; set; }
+        public string RecoveredBinaryBpsk { get; set; }
+        public string RecoveredAmi { get; set; }
+        public string RecoveredBinary { get; set; }
         public string? Message { get; set; }
         public string? Binary { get; private set; } 
         public string? AmiCode { get; private set; }
@@ -23,6 +23,7 @@ namespace TransmissionSimulator.Models
         public double NoiseLevel { get; set; } = 0.0;
         public double Amplitude { get; set; } = 1.0;
         public string EncodingType { get; set; }
+        public int Difference {get; set; }
     
         public void EncodeToAmiBipolar ()
         {
@@ -152,6 +153,18 @@ namespace TransmissionSimulator.Models
                 return;
             }
             this.BpskSignal = modulator.Modulate(this.NRZCode);
+        }
+
+        public void CalculateHammingDistance(string recoveredBinary)
+        {
+            int hammingDistance = 0;
+
+            for(int i = 0; i < this.Binary.Length; i++){
+                if(recoveredBinary[i] != this.Binary[i]){
+                    hammingDistance ++;
+                }
+            }
+            this.Difference = hammingDistance;
         }
     }
 }

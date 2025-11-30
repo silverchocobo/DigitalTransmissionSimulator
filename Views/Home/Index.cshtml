@@ -69,14 +69,15 @@
             </div>
 
             <div class="mt-4 p-3 bg-secondary text-white rounded">
-                <h5>Debug Information:</h5>
+                <h5>Transmissão AMI:</h5>
                 <div class="text-monospace">
-                    <p class="mb-0"><strong>Original AMI:</strong> @Model.AmiCode</p>
-                    <p class="mb-0"><strong>Recovered AMI:</strong> @Model.Debug_RecoveredAmi</p>
+                    <p class="mb-0"><strong>AMI Original:</strong> @Model.AmiCode</p>
+                    <p class="mb-0"><strong>AMI Recebido:</strong> @Model.RecoveredAmi</p>
                     <hr style="border-top: 1px solid white;" />
-                    <p class="mb-0"><strong>Original Binary:</strong> @Model.Binary</p>
-                    <p class="mb-0"><strong>Recovered Binary:</strong> @Model.Debug_RecoveredBinary</p>
+                    <p class="mb-0"><strong>Código Binário Original:</strong> @Model.Binary</p>
+                    <p class="mb-0"><strong>Código Binário Recebido:</strong> @Model.RecoveredBinary</p>
                 </div>
+                <h5>Diferença de bits: @Model.Difference</h5>
             </div>
         }
 
@@ -103,11 +104,12 @@
             </div>
 
             <div class="mt-4 p-3 bg-secondary text-white rounded">
-                <h5>BPSK Debug Information:</h5>
+                <h5>Transmissão BPSK:</h5>
                 <div class="text-monospace">
-                    <p class="mb-0"><strong>Original Binary:</strong> @Model.Binary</p>
-                    <p class="mb-0"><strong>Recovered Binary (BPSK):</strong> @Model.Debug_RecoveredBinaryBpsk</p>
+                    <p class="mb-0"><strong>Código Binário Original:</strong> @Model.Binary</p>
+                    <p class="mb-0"><strong>Código Binário Recebido (BPSK):</strong> @Model.RecoveredBinaryBpsk</p>
                 </div>
+                <h5>Diferença de bits: @Model.Difference</h5>
             </div>
         } 
 
