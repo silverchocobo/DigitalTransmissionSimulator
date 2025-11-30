@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "VDtfHmR7Hl0vchjvEr+MbMESyVBi5TmpgwlqRhB0AbjAsbZuaX+u7hfJ68l6un/EH8RRJjZghO5sU1AOquuu3g==",
+  "success": true,
+  "projectFilePath": "/home/alixsilver/Documents/Unisinos - Agatha/Redes II/Trabalho/TransmissionSimulator/TransmissionSimulator.csproj",
+  "expectedPackageFiles": [
+    "/home/alixsilver/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.20/microsoft.aspnetcore.app.ref.8.0.20.nupkg.sha512"
+  ],
+  "logs": []
+}
