@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TransmissionSimulator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4259d80bfe49117ff04114c0cb8f4ef1d9279b1d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c082cf0c565af89eb17fd0c11d17deb6fcf6ffd2")]
 [assembly: System.Reflection.AssemblyProductAttribute("TransmissionSimulator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TransmissionSimulator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
