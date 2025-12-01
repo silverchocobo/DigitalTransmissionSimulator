@@ -24,6 +24,7 @@ namespace TransmissionSimulator.Models
         public double Amplitude { get; set; } = 1.0;
         public string EncodingType { get; set; }
         public int Difference {get; set; }
+        public double SNR {get; set; }
     
         public void EncodeToAmiBipolar ()
         {

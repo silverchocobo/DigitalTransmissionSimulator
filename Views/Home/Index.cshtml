@@ -47,8 +47,14 @@
 
         @if (Model.EncodingType == "ami")
         {
-            <h4>ASCII para bits: @Model.Binary</h4>
-            <hr />
+            <div>
+                <h5 style="word-wrap: break-word">ASCII para bits: @Model.Binary</h5>
+                <hr />
+            </div>
+
+            <div>
+                <h5>SNR (dB): @Model.SNR</h5>
+            </div>
 
             <div class="row">
                 <div class="col-md-6">

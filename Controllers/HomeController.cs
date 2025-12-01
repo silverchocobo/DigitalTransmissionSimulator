@@ -49,6 +49,17 @@ public class HomeController : Controller
             model.RecoveredBinary = amiResult.RecoveredBinary;
 
             model.CalculateHammingDistance(model.RecoveredBinary);
+
+            //Calcular SNR
+
+            double signalPower =  Math.Pow(model.Amplitude, 2)/2;
+            double noisePower = Math.Pow(model.NoiseLevel, 2);
+            double snr = signalPower/noisePower;
+
+            double snrDb = 10 * Math.Log10(snr);
+
+            model.SNR = snrDb;
+
         }
         
         else if (model.EncodingType == "bpsk"){
